@@ -24,6 +24,7 @@ import arrow_left from './left_arrow.png'
 import Melody_logo from './Melody_logo.png'  // app logo
 import Melody_logo_2 from './Melody_logo_2.png'
 import Melody_logo_3 from './Melody_logo_3.png'
+import Melody_logo_4 from './Melody_logo_4.png'
 
 import clock_icon from './clock_icon.png'
 import img1 from './img1.jpg'
@@ -72,6 +73,7 @@ export const assets = {
     Melody_logo,
     Melody_logo_2,
     Melody_logo_3,
+    Melody_logo_4,
     clock_icon
 }
 
