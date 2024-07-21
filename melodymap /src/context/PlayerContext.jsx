@@ -1,7 +1,7 @@
 import { createContext, useEffect, useRef, useState } from "react";
-import { songsData } from "../assets/assets";
+//import { songsData } from "../assets/assets";
 // import { songsData } from "../assets/assets";
-//import axios from 'axios'
+import axios from 'axios'
 
 export const PlayerContext = createContext();
 
@@ -11,9 +11,11 @@ const PlayerContextProvider = (props) => {
     const seekBg = useRef();
     const seekBar = useRef();
 
+     const url = 'http://localhost:4000';
 
-    //const [songsData, setSongsData] = useState([]);
-    //const [albumsData,setAlbumData] = useState([]);
+
+    const [songsData, setSongsData] = useState([]);
+    const [albumsData,setAlbumData] = useState([]);
     const [track, setTrack] = useState(songsData[0]);
     const [playStatus, setPlayStatus] = useState(false);
     const [time, setTime] = useState({
@@ -38,29 +40,52 @@ const PlayerContextProvider = (props) => {
     }
 
     const playWithId = async (id) => {
-        await setTrack(songsData[id]);
+        await songsData.map((item) => {
+            if (id === item._id) {
+                setTrack(item);
+            }
+        })
+            ;
         await audioRef.current.play();
         setPlayStatus(true);
     }
 
-    const previous = async() => {
-        if (track.id>0) {
-            await setTrack(songsData[track.id-1]);
-            await audioRef.current.play();
-            setPlayStatus(true);
-        }
+    const previous = async () => {
+        songsData.map(async (item, index) => {
+            if (track._id === item._id && index > 0) {
+                await setTrack(songsData[index - 1]);
+                await audioRef.current.play();
+                setPlayStatus(true);
+            }
+        })
+
     }
     
-    const next = async() => {
-        if (track.id< songsData.length-1) {
-            await setTrack(songsData[track.id+1]);
-            await audioRef.current.play();
-            setPlayStatus(true);
-        }
+    const next = async () => {
+        songsData.map(async (item, index) => {
+            if (track._id === item._id && index < songsData.length-1) {
+                await setTrack(songsData[index + 1]);
+                await audioRef.current.play();
+                setPlayStatus(true);
+            }
+        })
     }
 
     const seekSong = async (e) => {
         audioRef.current.currentTime = ((e.nativeEvent.offsetX / seekBg.current.offsetWidth) * audioRef.current.duration)
+    }
+
+    const getSongsData = async () => {
+        const response = await axios.get(`${url}/api/song/list`);
+        setSongsData(response.data.songs);
+        console.log(response.data.songs);
+        setTrack(response.data.songs[0])
+    }
+
+    const getAlbumsData = async () => {
+        const response = await axios.get(`${url}/api/album/list`);
+        setAlbumData(response.data.albums);
+        console.log(response.data.albums);
     }
 
 
@@ -97,7 +122,7 @@ const PlayerContextProvider = (props) => {
         playWithId ,
         previous, next,
         seekSong,
-        // songsData,albumsData
+        songsData,albumsData
     }
 
     return (
